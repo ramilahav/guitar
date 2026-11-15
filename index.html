@@ -50,6 +50,7 @@
   .road .hint{color:var(--muted);font-size:14px;margin-bottom:14px}
   .neck-row{display:flex;align-items:center;gap:10px}
   .goal{flex:0 0 auto;width:120px;transition:filter .6s}
+  .goal svg{width:100%;height:auto}
   @media (max-width:600px){.goal{width:76px}}
   .neck{position:relative;flex:1;height:86px;border-radius:10px;
         background:linear-gradient(180deg,var(--wood),var(--wood2));
@@ -60,7 +61,7 @@
   .fret{position:absolute;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e9e3d6,#9b968c);opacity:.85}
   .inlay{position:absolute;width:12px;height:12px;border-radius:50%;background:#f1e7d0;opacity:.75;transform:translate(50%,-50%)}
   .string{position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(90deg,#d8d8d8,#fff,#bdbdbd);opacity:.7}
-  .pick{position:absolute;top:50%;transform:translate(50%,-50%);width:38px;height:44px;transition:right 1.4s cubic-bezier(.2,.8,.2,1);z-index:3;
+  .pick{position:absolute;top:50%;transform:translate(50%,-50%);width:38px;height:44px;line-height:0;transition:right 1.4s cubic-bezier(.2,.8,.2,1);z-index:3;
         filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
   .marks{position:relative;height:40px;margin:8px 0 0 130px}
   @media (max-width:600px){.marks{margin-left:86px}}
@@ -88,6 +89,30 @@
   .manual button{background:var(--hot);border:0;font-weight:700;cursor:pointer}
   .msg{font-size:13px;color:var(--muted);margin-top:6px;min-height:1em}
 
+  /* mode toggle */
+  .modes{display:flex;gap:14px;justify-content:center;margin:0 auto 18px;flex-wrap:wrap}
+  .mode-btn{font:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 26px;min-width:250px;justify-content:center;
+    font-size:clamp(18px,2.6vw,23px);font-weight:700;color:var(--ink);border-radius:20px;border:2px solid var(--line);
+    background:rgba(255,255,255,.06);transition:transform .15s, background .25s, border-color .25s, box-shadow .25s}
+  .mode-btn .ic{font-size:34px;line-height:1}
+  .mode-btn:hover{transform:translateY(-2px)}
+  .mode-btn[aria-pressed="true"]{border-color:transparent;background:linear-gradient(90deg,var(--amber),var(--hot));color:#2a0f2e;
+    box-shadow:0 8px 30px rgba(255,79,139,.45)}
+  body.voice .mode-btn[aria-pressed="true"]{background:linear-gradient(90deg,#5ee7df,#b490ff);box-shadow:0 8px 30px rgba(140,140,255,.5)}
+  @media (max-width:600px){.mode-btn{min-width:0;flex:1;padding:14px 12px}}
+  body.voice h1{background:linear-gradient(90deg,#5ee7df,#b490ff 60%,#ff8ad8);-webkit-background-clip:text;background-clip:text;color:transparent;
+     filter:drop-shadow(0 4px 18px rgba(140,140,255,.45))}
+  body.voice .fill{background:linear-gradient(270deg,rgba(94,231,223,.45),rgba(180,144,255,.6));box-shadow:0 0 24px rgba(180,144,255,.6)}
+  body.voice .neck{background:linear-gradient(180deg,#2a1d4f,#1d1438)}
+  body.voice .tline .v.big{color:#8ff3ea}
+  .staff{position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.55)}
+  .bar{position:absolute;top:18%;bottom:18%;width:2px;background:rgba(255,255,255,.55)}
+  .clef{position:absolute;right:6px;top:50%;transform:translateY(-52%);font-size:66px;line-height:1;color:#fff;opacity:.9;font-family:serif}
+  .note{position:absolute;transform:translate(50%,-50%);font-size:24px;line-height:1;color:#fff;opacity:.22;font-family:serif}
+  .note.on{opacity:1;color:#8ff3ea;text-shadow:0 0 10px rgba(143,243,234,.8)}
+  .goal-v,.pick-v{display:none}
+  body.voice .goal-g,body.voice .pick-g{display:none}
+  body.voice .goal-v,body.voice .pick-v{display:block}
   .done-banner{display:none;margin-top:18px;text-align:center;padding:22px;border-radius:22px;
      background:linear-gradient(90deg,rgba(124,245,176,.2),rgba(255,179,64,.2));border:1px solid rgba(124,245,176,.5)}
   .done-banner .t{font-family:"Suez One",serif;font-size:clamp(28px,5vw,44px)}
@@ -98,9 +123,13 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="modes" role="group" aria-label="בחירת היעד">
+    <button class="mode-btn" id="btnG" data-mode="guitar" aria-pressed="true"><span class="ic">🎸</span>גיטרה חשמלית</button>
+    <button class="mode-btn" id="btnV" data-mode="voice" aria-pressed="false"><span class="ic">🎤</span>לימודי פיתוח קול</button>
+  </div>
   <header>
-    <h1>הדרך לגיטרה 🎸</h1>
-    <div class="sub">חודש רצוף בלי איחורים = גיטרה חשמלית לרוני</div>
+    <h1 id="title">הדרך לגיטרה 🎸</h1>
+    <div class="sub" id="subtitle">חודש רצוף בלי איחורים = גיטרה חשמלית לרוני</div>
   </header>
 
   <div id="waiting" class="card waiting">טוען נתונים…</div>
@@ -113,7 +142,7 @@
         <div class="lbl" id="daysLbl">ימים ללא איחור</div>
       </div>
       <div class="card target">
-        <div class="tline" style="flex-wrap:wrap"><span class="k">🎯 תאריך קבלת הגיטרה</span><span class="v big" id="targetDate">—</span>
+        <div class="tline" style="flex-wrap:wrap"><span class="k" id="targetK">🎯 תאריך קבלת הגיטרה</span><span class="v big" id="targetDate">—</span>
           <span id="vacNote" style="flex-basis:100%;font-size:13px;color:var(--muted)"></span></div>
         <div class="tline"><span class="k">⏳ נשארו עוד</span><span class="v" id="remain">—</span></div>
         <div class="tline"><span class="k">📍 הרצף התחיל אחרי</span><span class="v" id="lastBreak">—</span></div>
@@ -123,25 +152,33 @@
 
     <div id="doneBanner" class="done-banner">
       <div class="t">🎉 רוני עשתה את זה! 🎉</div>
-      <div>חודש שלם בלי איחורים — הגיטרה החשמלית מחכה!</div>
+      <div id="doneText">חודש שלם בלי איחורים — הגיטרה החשמלית מחכה!</div>
     </div>
 
     <section class="card road">
-      <h2>המסלול על צוואר הגיטרה</h2>
-      <div class="hint">כל שריג הוא יום. כשהמפרט מגיע לקצה — מקבלים את הגיטרה.</div>
+      <h2 id="roadTitle">המסלול על צוואר הגיטרה</h2>
+      <div class="hint" id="roadHint">כל שריג הוא יום. כשהמפרט מגיע לקצה — מקבלים את הגיטרה.</div>
       <div class="neck-row">
         <div class="neck" id="neck">
           <div class="fill" id="fill"></div>
           <div class="strings" id="strings"></div>
           <div class="frets" id="frets"></div>
-          <svg class="pick" id="pick" viewBox="0 0 38 44" aria-hidden="true">
+          <div class="pick" id="pick"><svg class="pick-g" viewBox="0 0 38 44" width="38" height="44" aria-hidden="true">
             <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff4f8b"/></linearGradient></defs>
             <path d="M19 43 C9 33 1 22 1 12 C1 5 9 1 19 1 C29 1 37 5 37 12 C37 22 29 33 19 43Z" fill="url(#pg)" stroke="#fff" stroke-width="2"/>
             <text x="19" y="19" text-anchor="middle" font-family="Rubik" font-weight="900" font-size="11" fill="#2a0f2e">רוני</text>
           </svg>
+          <svg class="pick-v" viewBox="0 0 38 44" width="38" height="44" aria-hidden="true">
+            <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8ff3ea"/><stop offset="1" stop-color="#b490ff"/></linearGradient></defs>
+            <circle cx="19" cy="19" r="17" fill="url(#mg)" stroke="#fff" stroke-width="2"/>
+            <rect x="14" y="7" width="10" height="16" rx="5" fill="#2a0f2e"/>
+            <path d="M11 18 a8 8 0 0 0 16 0" fill="none" stroke="#2a0f2e" stroke-width="2"/>
+            <line x1="19" y1="26" x2="19" y2="31" stroke="#2a0f2e" stroke-width="2"/>
+            <text x="19" y="42.5" text-anchor="middle" font-family="Rubik" font-weight="900" font-size="8" fill="#fff">רוני</text>
+          </svg></div>
         </div>
         <!-- original generic electric guitar illustration -->
-        <svg class="goal" id="goal" viewBox="0 0 120 200" aria-label="גיטרה חשמלית">
+        <div class="goal" id="goal"><svg class="goal-g" viewBox="0 0 120 200" aria-label="גיטרה חשמלית">
           <defs>
             <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4f8b"/><stop offset="1" stop-color="#8b2fd6"/></linearGradient>
           </defs>
@@ -158,6 +195,22 @@
           <circle cx="86" cy="168" r="4" fill="#ffd27a"/><circle cx="80" cy="180" r="4" fill="#ffd27a"/>
           <g stroke="#fff" stroke-width=".7" opacity=".8"><line x1="58" y1="20" x2="58" y2="170"/><line x1="61" y1="20" x2="61" y2="170"/><line x1="64" y1="20" x2="64" y2="170"/></g>
         </svg>
+        <!-- original generic studio microphone illustration -->
+        <svg class="goal-v" viewBox="0 0 120 200" aria-label="מיקרופון">
+          <defs>
+            <linearGradient id="mh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ee7df"/><stop offset="1" stop-color="#b490ff"/></linearGradient>
+          </defs>
+          <g fill="#ff8ad8" opacity=".9"><text x="8" y="40" font-size="26" font-family="serif">♪</text><text x="94" y="30" font-size="22" font-family="serif">♫</text><text x="98" y="92" font-size="18" font-family="serif">♪</text></g>
+          <rect x="34" y="14" width="52" height="84" rx="26" fill="url(#mh)" stroke="#fff" stroke-width="2"/>
+          <g stroke="#2a1d4f" stroke-width="1.6" opacity=".55">
+            <line x1="40" y1="34" x2="80" y2="34"/><line x1="37" y1="46" x2="83" y2="46"/><line x1="36" y1="58" x2="84" y2="58"/><line x1="37" y1="70" x2="83" y2="70"/><line x1="40" y1="82" x2="80" y2="82"/>
+          </g>
+          <rect x="34" y="60" width="52" height="8" fill="#e9e3d6" opacity=".85"/>
+          <path d="M24 70 a36 36 0 0 0 72 0" fill="none" stroke="#e9e3d6" stroke-width="5" stroke-linecap="round"/>
+          <rect x="56" y="106" width="8" height="54" fill="#cfcfcf"/>
+          <rect x="30" y="160" width="60" height="10" rx="5" fill="#e9e3d6"/>
+          <ellipse cx="60" cy="182" rx="40" ry="8" fill="#3a2f5c" stroke="#e9e3d6" stroke-width="2"/>
+        </svg></div>
       </div>
       <div class="marks" id="marks"></div>
       <div class="bar-meta"><span id="startLbl"></span><span id="endLbl"></span></div>
@@ -172,8 +225,9 @@
           <li>איחור של יותר מרבע שעה נרשם כחיסור בשיעור הראשון — וגם הוא קוטע את הרצף.</li>
           <li>חיסור מוצדק (מחלה, אישור) לא קוטע את הרצף.</li>
           <li>שבת נספרת אוטומטית כיום ללא איחור.</li>
-          <li>ימי חופשה (חנוכה 6–12 בדצמבר) לא נספרים — הספירה עוצרת ותאריך הגיטרה זז בהתאם.</li>
-          <li>תאריך הגיטרה = חודש מהאיחור האחרון, בתוספת ימי החופשה שבדרך.</li>
+          <li>ימי חופשה (חנוכה 6–12 בדצמבר) לא נספרים — הספירה עוצרת ותאריך היעד זז בהתאם.</li>
+          <li>אחרי 30 ימים נספרים בלי איחור או חיסור — רוני מגיעה ליעד: גיטרה חשמלית או שיעורי פיתוח קול, לבחירתה.</li>
+          <li>תאריך היעד = חודש מהאיחור האחרון, בתוספת ימי החופשה שבדרך.</li>
         </ul>
       </div>
       <div class="card">
@@ -211,6 +265,49 @@
   function diffDays(a,b){ return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000); }
   function fmt(d){ return "יום "+DOW[d.getDay()]+", "+d.getDate()+" "+HEB_MONTHS[d.getMonth()]+" "+d.getFullYear(); }
   function fmtShort(d){ return d.getDate()+"."+(d.getMonth()+1); }
+
+  const TEXT={
+    guitar:{title:"הדרך לגיטרה 🎸",sub:"חודש רצוף בלי איחורים = גיטרה חשמלית לרוני",doc:"הדרך לגיטרה",
+      targetK:"🎯 תאריך קבלת הגיטרה",road:"המסלול על צוואר הגיטרה",hint:"כל שריג הוא יום. כשהמפרט מגיע לקצה — מקבלים את הגיטרה.",
+      goal:"גיטרה!",done:"חודש שלם בלי איחורים — הגיטרה החשמלית מחכה!",end:"🎸"},
+    voice:{title:"הדרך לפיתוח קול 🎤",sub:"חודש רצוף בלי איחורים = שיעורי פיתוח קול לרוני",doc:"הדרך לפיתוח קול",
+      targetK:"🎯 תאריך תחילת שיעורי פיתוח הקול",road:"המסלול על החמשה",hint:"כל תו הוא יום. כשהחמשה מתמלאת — מתחילים את שיעורי פיתוח הקול.",
+      goal:"שיעור ראשון!",done:"חודש שלם בלי איחורים — שיעורי פיתוח הקול מחכים!",end:"🎤"}
+  };
+  let MODE="guitar";
+  try{ const h=(location.hash||"").replace("#",""); MODE = (h==="voice"||h==="guitar") ? h : (localStorage.getItem("roniGoal")||"guitar"); }catch(e){}
+  if(MODE!=="voice") MODE="guitar";
+  function applyMode(){
+    const t=TEXT[MODE];
+    document.body.classList.toggle("voice",MODE==="voice");
+    $("btnG").setAttribute("aria-pressed",MODE==="guitar"); $("btnV").setAttribute("aria-pressed",MODE==="voice");
+    $("title").textContent=t.title; $("subtitle").textContent=t.sub; document.title=t.doc;
+    $("targetK").textContent=t.targetK; $("roadTitle").textContent=t.road; $("roadHint").textContent=t.hint; $("doneText").textContent=t.done;
+  }
+  function setMode(m){
+    MODE=m; try{ localStorage.setItem("roniGoal",m); }catch(e){}
+    try{ history.replaceState(null,"","#"+m); }catch(e){ try{ location.hash=m; }catch(_){} }
+    applyMode(); if(current && current.lastBreak) render(current);
+  }
+  document.querySelectorAll(".mode-btn").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+  window.addEventListener("hashchange",()=>{ const h=location.hash.replace("#",""); if((h==="voice"||h==="guitar")&&h!==MODE) setMode(h); });
+  applyMode();
+
+  function buildStaff(total,shown){
+    const frets=$("frets"), strings=$("strings"), marks=$("marks");
+    frets.innerHTML=""; strings.innerHTML=""; marks.innerHTML="";
+    const lines=[22,36,50,64,78];
+    lines.forEach(t=>{ const s=document.createElement("div"); s.className="staff"; s.style.top=t+"%"; strings.appendChild(s); });
+    const clef=document.createElement("div"); clef.className="clef"; clef.textContent="𝄞"; frets.appendChild(clef);
+    for(let w=7; w<total; w+=7){ const b=document.createElement("div"); b.className="bar"; b.style.right=(w/total*100)+"%"; frets.appendChild(b); }
+    const melody=[64,57,50,43,36,43,50, 57,50,43,50,57,64,71, 64,57,50,57,43,36,29, 36,43,50,57,64,57,50, 43,36,29];
+    for(let i=1;i<=total;i++){
+      const n=document.createElement("div"); n.className="note"+(i<=shown?" on":"");
+      n.textContent = (i%7===0)?"♫":"♪";
+      n.style.right=((i-.5)/total*100)+"%"; n.style.top=melody[(i-1)%melody.length]+"%";
+      frets.appendChild(n);
+    }
+  }
 
   function buildNeck(total){
     const frets=$("frets"), strings=$("strings"), marks=$("marks");
@@ -259,14 +356,14 @@
     $("lastBreak").textContent=(state.lastBreakType||"איחור")+" ב-"+fmtShort(last)+"."+last.getFullYear();
     $("pct").textContent=pct+"%";
 
-    buildNeck(total);
-    requestAnimationFrame(()=>{ $("fill").style.width=pct+"%"; $("pick").style.right=`clamp(19px, ${pct}%, calc(100% - 19px))`; });
+    if(MODE==='voice') buildStaff(total,shown); else buildNeck(total);
+    requestAnimationFrame(()=>{ $("fill").style.width=pct+"%"; $("pick").style.right=`clamp(${MODE==="voice"?70:19}px, ${pct}%, calc(100% - 19px))`; });
     const g=$("goal");
     g.style.filter=`grayscale(${1-pct/100}) brightness(${.6+.4*pct/100})`;
     g.classList.toggle("glow",done);
     $("doneBanner").style.display = done?"block":"none";
 
-    const ms=[{d:7,t:"שבוע 1"},{d:14,t:"שבועיים"},{d:Math.round(total/2),t:"חצי דרך"},{d:21,t:"3 שבועות"},{d:total,t:"גיטרה!"}]
+    const ms=[{d:7,t:"שבוע 1"},{d:14,t:"שבועיים"},{d:Math.round(total/2),t:"חצי דרך"},{d:21,t:"3 שבועות"},{d:total,t:TEXT[MODE].goal}]
       .filter((m,i,a)=>m.d<=total && a.findIndex(x=>Math.abs(x.d-m.d)<2)===i);
     const marks=$("marks");
     ms.forEach(m=>{ const el=document.createElement("div"); el.className="mark"+(shown>=m.d?" done":"");
@@ -274,7 +371,7 @@
       const md=dateOfCount(m.d);
       el.innerHTML=`<b>${shown>=m.d?"✓ ":""}${m.t}</b>${fmtShort(md)}`; marks.appendChild(el); });
     $("startLbl").textContent="התחלה: "+fmtShort(last);
-    $("endLbl").textContent="🎸 "+fmtShort(target);
+    $("endLbl").textContent=TEXT[MODE].end+" "+fmtShort(target);
 
     const hist=$("hist"); hist.innerHTML="";
     const resets=(state.resets||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
