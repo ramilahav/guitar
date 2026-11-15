@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הדרך לגיטרה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&family=Suez+One&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#1b1035; --bg2:#3a1450; --ink:#fff7ee; --muted:#cbb8e6;
+    --hot:#ff4f8b; --amber:#ffb340; --lime:#7cf5b0; --wood:#5a3420; --wood2:#3b2014;
+    --card:rgba(255,255,255,.07); --line:rgba(255,255,255,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Rubik",system-ui,sans-serif; color:var(--ink);
+    background:radial-gradient(1200px 600px at 80% -10%, #6b1f6e 0%, transparent 60%),
+               radial-gradient(900px 500px at 0% 110%, #20306e 0%, transparent 60%),
+               linear-gradient(160deg,var(--bg1),var(--bg2));
+    min-height:100vh;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 18px 60px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-family:"Suez One",serif;font-weight:400;font-size:clamp(40px,7vw,76px);margin:0;letter-spacing:.5px;
+     background:linear-gradient(90deg,var(--amber),var(--hot) 60%,#b86bff);-webkit-background-clip:text;background-clip:text;color:transparent;
+     filter:drop-shadow(0 4px 18px rgba(255,79,139,.35))}
+  .sub{color:var(--muted);font-size:clamp(15px,2.2vw,19px);margin-top:6px}
+
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:22px}
+  @media (max-width:760px){.hero{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;backdrop-filter:blur(6px)}
+  .streak{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .streak .num{font-family:"Suez One",serif;font-size:clamp(84px,16vw,150px);line-height:1;color:var(--ink);
+     text-shadow:0 0 30px rgba(255,179,64,.55),0 0 2px #fff}
+  .streak .lbl{font-size:clamp(22px,3.4vw,30px);font-weight:700;margin-top:4px}
+  .streak .flame{font-size:30px;margin-bottom:4px}
+  .target{display:flex;flex-direction:column;gap:12px;justify-content:center}
+  .tline{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:10px}
+  .tline:last-child{border-bottom:0;padding-bottom:0}
+  .tline .k{color:var(--muted);font-size:15px}
+  .tline .v{font-weight:700;font-size:20px;text-align:left}
+  .tline .v.big{font-family:"Suez One",serif;font-weight:400;font-size:26px;color:var(--amber)}
+
+  /* fretboard */
+  .road{margin-top:18px;padding:22px 18px 18px}
+  .road h2{margin:0 0 4px;font-size:20px}
+  .road .hint{color:var(--muted);font-size:14px;margin-bottom:14px}
+  .neck-row{display:flex;align-items:center;gap:10px}
+  .goal{flex:0 0 auto;width:120px;transition:filter .6s}
+  @media (max-width:600px){.goal{width:76px}}
+  .neck{position:relative;flex:1;height:86px;border-radius:10px;
+        background:linear-gradient(180deg,var(--wood),var(--wood2));
+        box-shadow:inset 0 2px 0 rgba(255,255,255,.08), inset 0 -3px 8px rgba(0,0,0,.4), 0 10px 30px rgba(0,0,0,.35);overflow:hidden}
+  .fill{position:absolute;inset:0 0 0 auto;width:0;background:linear-gradient(270deg,rgba(255,179,64,.55),rgba(255,79,139,.65));
+        transition:width 1.4s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 24px rgba(255,79,139,.6)}
+  .frets,.strings{position:absolute;inset:0}
+  .fret{position:absolute;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#e9e3d6,#9b968c);opacity:.85}
+  .inlay{position:absolute;width:12px;height:12px;border-radius:50%;background:#f1e7d0;opacity:.75;transform:translate(50%,-50%)}
+  .string{position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(90deg,#d8d8d8,#fff,#bdbdbd);opacity:.7}
+  .pick{position:absolute;top:50%;transform:translate(50%,-50%);width:38px;height:44px;transition:right 1.4s cubic-bezier(.2,.8,.2,1);z-index:3;
+        filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
+  .marks{position:relative;height:40px;margin:8px 0 0 130px}
+  @media (max-width:600px){.marks{margin-left:86px}}
+  .mark{position:absolute;top:0;transform:translateX(50%);font-size:12px;color:var(--muted);white-space:nowrap;text-align:center}
+  .mark b{display:block;font-size:13px;color:var(--ink)}
+  .mark.done b{color:var(--lime)}
+  .bar-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-top:6px}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+  @media (max-width:760px){.row2{grid-template-columns:1fr}}
+  .rules li{margin:6px 0;color:#efe6ff}
+  .rules{padding-inline-start:20px;margin:8px 0 0}
+  .hist{list-style:none;padding:0;margin:8px 0 0}
+  .hist li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .hist li:last-child{border-bottom:0}
+  .tag{font-size:12px;padding:2px 8px;border-radius:99px;background:rgba(255,79,139,.2);color:#ffc2d6}
+  .tag.abs{background:rgba(124,141,255,.22);color:#c9d0ff}
+  .empty{color:var(--muted)}
+  footer{margin-top:22px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
+  footer a{color:var(--amber)}
+  details{margin-top:14px}
+  summary{cursor:pointer;color:var(--muted);font-size:13px}
+  .manual{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .manual input,.manual select,.manual button{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--ink)}
+  .manual button{background:var(--hot);border:0;font-weight:700;cursor:pointer}
+  .msg{font-size:13px;color:var(--muted);margin-top:6px;min-height:1em}
+
+  .done-banner{display:none;margin-top:18px;text-align:center;padding:22px;border-radius:22px;
+     background:linear-gradient(90deg,rgba(124,245,176,.2),rgba(255,179,64,.2));border:1px solid rgba(124,245,176,.5)}
+  .done-banner .t{font-family:"Suez One",serif;font-size:clamp(28px,5vw,44px)}
+  .waiting{text-align:center;color:var(--muted);padding:12px}
+  .glow{animation:glow 2.4s ease-in-out infinite}
+  @keyframes glow{50%{filter:drop-shadow(0 0 18px rgba(255,179,64,.9))}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>הדרך לגיטרה 🎸</h1>
+    <div class="sub">חודש רצוף בלי איחורים = גיטרה חשמלית לרוני</div>
+  </header>
+
+  <div id="waiting" class="card waiting">טוען נתונים…</div>
+
+  <div id="main" style="display:none">
+    <section class="hero">
+      <div class="card streak">
+        <div class="flame">🔥</div>
+        <div class="num" id="days">0</div>
+        <div class="lbl" id="daysLbl">ימים ללא איחור</div>
+      </div>
+      <div class="card target">
+        <div class="tline" style="flex-wrap:wrap"><span class="k">🎯 תאריך קבלת הגיטרה</span><span class="v big" id="targetDate">—</span>
+          <span id="vacNote" style="flex-basis:100%;font-size:13px;color:var(--muted)"></span></div>
+        <div class="tline"><span class="k">⏳ נשארו עוד</span><span class="v" id="remain">—</span></div>
+        <div class="tline"><span class="k">📍 הרצף התחיל אחרי</span><span class="v" id="lastBreak">—</span></div>
+        <div class="tline"><span class="k">📊 התקדמות</span><span class="v" id="pct">—</span></div>
+      </div>
+    </section>
+
+    <div id="doneBanner" class="done-banner">
+      <div class="t">🎉 רוני עשתה את זה! 🎉</div>
+      <div>חודש שלם בלי איחורים — הגיטרה החשמלית מחכה!</div>
+    </div>
+
+    <section class="card road">
+      <h2>המסלול על צוואר הגיטרה</h2>
+      <div class="hint">כל שריג הוא יום. כשהמפרט מגיע לקצה — מקבלים את הגיטרה.</div>
+      <div class="neck-row">
+        <div class="neck" id="neck">
+          <div class="fill" id="fill"></div>
+          <div class="strings" id="strings"></div>
+          <div class="frets" id="frets"></div>
+          <svg class="pick" id="pick" viewBox="0 0 38 44" aria-hidden="true">
+            <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff4f8b"/></linearGradient></defs>
+            <path d="M19 43 C9 33 1 22 1 12 C1 5 9 1 19 1 C29 1 37 5 37 12 C37 22 29 33 19 43Z" fill="url(#pg)" stroke="#fff" stroke-width="2"/>
+            <text x="19" y="19" text-anchor="middle" font-family="Rubik" font-weight="900" font-size="11" fill="#2a0f2e">רוני</text>
+          </svg>
+        </div>
+        <!-- original generic electric guitar illustration -->
+        <svg class="goal" id="goal" viewBox="0 0 120 200" aria-label="גיטרה חשמלית">
+          <defs>
+            <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4f8b"/><stop offset="1" stop-color="#8b2fd6"/></linearGradient>
+          </defs>
+          <rect x="54" y="6" width="14" height="30" rx="4" fill="#2b1a10"/>
+          <circle cx="51" cy="12" r="3" fill="#ddd"/><circle cx="51" cy="22" r="3" fill="#ddd"/><circle cx="51" cy="32" r="3" fill="#ddd"/>
+          <circle cx="71" cy="12" r="3" fill="#ddd"/><circle cx="71" cy="22" r="3" fill="#ddd"/><circle cx="71" cy="32" r="3" fill="#ddd"/>
+          <rect x="56" y="34" width="10" height="80" fill="#6b3d22"/>
+          <g stroke="#e9e3d6" stroke-width="1.2">
+            <line x1="56" y1="46" x2="66" y2="46"/><line x1="56" y1="58" x2="66" y2="58"/><line x1="56" y1="70" x2="66" y2="70"/><line x1="56" y1="82" x2="66" y2="82"/><line x1="56" y1="94" x2="66" y2="94"/>
+          </g>
+          <path d="M44 110 C30 100 14 104 14 124 C14 140 26 146 24 158 C22 174 34 194 60 194 C90 194 102 176 98 160 C95 148 106 140 104 122 C102 104 84 100 76 110 C72 116 50 116 44 110Z" fill="url(#body)" stroke="#fff" stroke-width="2"/>
+          <rect x="48" y="128" width="26" height="8" rx="2" fill="#222"/><rect x="48" y="146" width="26" height="8" rx="2" fill="#222"/>
+          <rect x="50" y="166" width="22" height="5" rx="2" fill="#ccc"/>
+          <circle cx="86" cy="168" r="4" fill="#ffd27a"/><circle cx="80" cy="180" r="4" fill="#ffd27a"/>
+          <g stroke="#fff" stroke-width=".7" opacity=".8"><line x1="58" y1="20" x2="58" y2="170"/><line x1="61" y1="20" x2="61" y2="170"/><line x1="64" y1="20" x2="64" y2="170"/></g>
+        </svg>
+      </div>
+      <div class="marks" id="marks"></div>
+      <div class="bar-meta"><span id="startLbl"></span><span id="endLbl"></span></div>
+    </section>
+
+    <section class="row2">
+      <div class="card">
+        <h2 style="margin:0;font-size:20px">חוקי המשחק</h2>
+        <ul class="rules">
+          <li>היעד: חודש רצוף שלם בלי איחורים לבית הספר.</li>
+          <li>איחור לשיעור הראשון שמדווח ב-Webtop קוטע את הרצף ומחזיר להתחלה.</li>
+          <li>איחור של יותר מרבע שעה נרשם כחיסור בשיעור הראשון — וגם הוא קוטע את הרצף.</li>
+          <li>חיסור מוצדק (מחלה, אישור) לא קוטע את הרצף.</li>
+          <li>שבת נספרת אוטומטית כיום ללא איחור.</li>
+          <li>ימי חופשה (חנוכה 6–12 בדצמבר) לא נספרים — הספירה עוצרת ותאריך הגיטרה זז בהתאם.</li>
+          <li>תאריך הגיטרה = חודש מהאיחור האחרון, בתוספת ימי החופשה שבדרך.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2 style="margin:0;font-size:20px">היסטוריית איפוסים</h2>
+        <ul class="hist" id="hist"></ul>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div id="checked">הנתונים נמשכים מ-<a href="https://webtop.smartschool.co.il/">Webtop</a></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const HEB_MONTHS = ["בינואר","בפברואר","במרץ","באפריל","במאי","ביוני","ביולי","באוגוסט","בספטמבר","באוקטובר","בנובמבר","בדצמבר"];
+  const DOW = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
+
+  function parseD(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+  function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function todayLocal(){
+    // Israel date, independent of viewer's timezone
+    try{
+      const s = new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jerusalem",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+      return parseD(s);
+    }catch(e){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+  }
+  function addMonth(d){
+    const y=d.getFullYear(), m=d.getMonth()+1, day=d.getDate();
+    const last=new Date(y,m+1,0).getDate();
+    return new Date(y,m,Math.min(day,last));
+  }
+  function diffDays(a,b){ return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000); }
+  function fmt(d){ return "יום "+DOW[d.getDay()]+", "+d.getDate()+" "+HEB_MONTHS[d.getMonth()]+" "+d.getFullYear(); }
+  function fmtShort(d){ return d.getDate()+"."+(d.getMonth()+1); }
+
+  function buildNeck(total){
+    const frets=$("frets"), strings=$("strings"), marks=$("marks");
+    frets.innerHTML=""; strings.innerHTML=""; marks.innerHTML="";
+    for(let i=0;i<6;i++){ const s=document.createElement("div"); s.className="string"; s.style.top=(12+i*12.4)+"%"; strings.appendChild(s); }
+    const inl=[3,5,7,9,15,17,19,21,27,29];
+    for(let i=1;i<total;i++){
+      const f=document.createElement("div"); f.className="fret"; f.style.right=(i/total*100)+"%"; frets.appendChild(f);
+    }
+    for(let i=1;i<=total;i++){
+      const center=((i-.5)/total*100);
+      if(inl.includes(i)){ const d=document.createElement("div"); d.className="inlay"; d.style.right=center+"%"; d.style.top="50%"; frets.appendChild(d); }
+      if(i===12||i===24){ [33,67].forEach(t=>{const d=document.createElement("div"); d.className="inlay"; d.style.right=center+"%"; d.style.top=t+"%"; frets.appendChild(d);}); }
+    }
+  }
+
+  function render(state){
+    $("waiting").style.display="none"; $("main").style.display="";
+    if(!state || !state.lastBreak){
+      $("main").style.display="none"; $("waiting").style.display="";
+      $("waiting").textContent="עוד אין נתונים מ-Webtop. ברגע שיימשך האיחור האחרון, המסלול יופיע כאן.";
+      return;
+    }
+    const vac=(state.vacations&&state.vacations.length?state.vacations:DEFAULT_VAC).map(v=>({from:v.from,to:v.to,name:v.name}));
+    const isVac=d=>{ const s=iso(d); return vac.some(v=>s>=v.from && s<=v.to); };
+    const last=parseD(state.lastBreak), today=todayLocal();
+    const total=diffDays(last,addMonth(last));          // counted days needed (a calendar month)
+    // walk forward from the day after the break; vacation days are skipped (not counted, don't break)
+    const dateOfCount=k=>{ const d=new Date(last); let c=0; while(c<k){ d.setDate(d.getDate()+1); if(!isVac(d)) c++; } return d; };
+    const target=dateOfCount(total);
+    let days=0; { const d=new Date(last); while(diffDays(d,today)>0){ d.setDate(d.getDate()+1); if(!isVac(d)) days++; } }
+    const skipped=diffDays(last,target)-total;
+    const vacNow=vac.find(v=>{const s=iso(today); return s>=v.from&&s<=v.to;});
+    const done = days>=total;
+    const shown=Math.min(days,total);
+    const pct=Math.round(shown/total*100);
+
+    $("days").textContent=days;
+    $("daysLbl").textContent = days===1 ? "יום אחד ללא איחור" : "ימים ללא איחור";
+    if(days===1) $("days").textContent="1";
+    $("targetDate").textContent=fmt(target);
+    $("vacNote").textContent = vacNow ? `🕎 עכשיו ${vacNow.name} — הספירה בהפסקה, הרצף לא נקטע.`
+      : (skipped>0 ? `כולל ${skipped} ימי חופשה שלא נספרים (${vac.filter(v=>v.to>iso(last)&&v.from<=iso(target)).map(v=>v.name).join(", ")}).` : "");
+    const rem=Math.max(0,total-days);
+    $("remain").textContent= done ? "0 — הגיעה! 🎉" : (rem===1?"יום אחד":rem+" ימים");
+    $("lastBreak").textContent=(state.lastBreakType||"איחור")+" ב-"+fmtShort(last)+"."+last.getFullYear();
+    $("pct").textContent=pct+"%";
+
+    buildNeck(total);
+    requestAnimationFrame(()=>{ $("fill").style.width=pct+"%"; $("pick").style.right=`clamp(19px, ${pct}%, calc(100% - 19px))`; });
+    const g=$("goal");
+    g.style.filter=`grayscale(${1-pct/100}) brightness(${.6+.4*pct/100})`;
+    g.classList.toggle("glow",done);
+    $("doneBanner").style.display = done?"block":"none";
+
+    const ms=[{d:7,t:"שבוע 1"},{d:14,t:"שבועיים"},{d:Math.round(total/2),t:"חצי דרך"},{d:21,t:"3 שבועות"},{d:total,t:"גיטרה!"}]
+      .filter((m,i,a)=>m.d<=total && a.findIndex(x=>Math.abs(x.d-m.d)<2)===i);
+    const marks=$("marks");
+    ms.forEach(m=>{ const el=document.createElement("div"); el.className="mark"+(shown>=m.d?" done":"");
+      el.style.right=(m.d/total*100)+"%";
+      const md=dateOfCount(m.d);
+      el.innerHTML=`<b>${shown>=m.d?"✓ ":""}${m.t}</b>${fmtShort(md)}`; marks.appendChild(el); });
+    $("startLbl").textContent="התחלה: "+fmtShort(last);
+    $("endLbl").textContent="🎸 "+fmtShort(target);
+
+    const hist=$("hist"); hist.innerHTML="";
+    const resets=(state.resets||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+    if(!resets.length){ hist.innerHTML='<li class="empty">אין איפוסים רשומים</li>'; }
+    resets.forEach(r=>{ const li=document.createElement("li"); const d=parseD(r.date);
+      const abs=(r.type||"").includes("חיסור");
+      li.innerHTML=`<span>${fmtShort(d)}.${d.getFullYear()}${r.note?` · <span style="color:var(--muted)">${escapeH(r.note)}</span>`:""}</span><span class="tag${abs?" abs":""}">${escapeH(r.type||"איחור")}</span>`;
+      hist.appendChild(li); });
+
+    if(state.checkedAt){
+      const c=new Date(state.checkedAt);
+      let s; try{ s=c.toLocaleString("he-IL",{timeZone:"Asia/Jerusalem",dateStyle:"short",timeStyle:"short"}); }catch(e){ s=c.toLocaleString(); }
+      $("checked").innerHTML=`נבדק לאחרונה מול <a href="https://webtop.smartschool.co.il/">Webtop</a>: ${s}`;
+    }
+  }
+  function escapeH(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+  const DEFAULT_VAC=[{from:"2026-12-06",to:"2026-12-12",name:"חופשת חנוכה"}];
+  let current=null;
+  const timer=setTimeout(()=>{ if(!current){ $("waiting").textContent="לא הצלחתי לטעון את הנתונים. נסו לרענן בעוד רגע."; } },10000);
+  fetch("data.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.json()).then(d=>{ clearTimeout(timer); current=d; render(d); })
+    .catch(()=>{ clearTimeout(timer); $("waiting").textContent="לא הצלחתי לטעון את הנתונים. נסו לרענן בעוד רגע."; });
+})();
+</script>
+</body>
+</html>
