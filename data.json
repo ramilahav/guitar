@@ -1,7 +1,7 @@
 {
- "lastBreak": "2026-11-15",
- "lastBreakType": "חיסור",
- "checkedAt": "2026-11-15T20:30:00Z",
+ "lastBreak": "2026-11-16",
+ "lastBreakType": "איחור",
+ "checkedAt": "2026-11-16T08:31:00Z",
  "source": "webtop",
  "vacations": [
   {
@@ -11,6 +11,11 @@
   }
  ],
  "resets": [
+  {
+   "date": "2026-11-16",
+   "type": "איחור",
+   "note": "שיעור 1"
+  },
   {
    "date": "2026-11-15",
    "type": "חיסור",
