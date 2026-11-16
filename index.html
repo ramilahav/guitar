@@ -140,6 +140,7 @@
         <div class="flame">🔥</div>
         <div class="num" id="days">0</div>
         <div class="lbl" id="daysLbl">ימים ללא איחור</div>
+        <div id="pendingNote" style="margin-top:10px;font-size:14px;color:var(--muted)"></div>
       </div>
       <div class="card target">
         <div class="tline" style="flex-wrap:wrap"><span class="k" id="targetK">🎯 תאריך קבלת הגיטרה</span><span class="v big" id="targetDate">—</span>
@@ -257,6 +258,18 @@
       return parseD(s);
     }catch(e){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
   }
+  // last day confirmed by a Webtop check: the check date if it ran at/after 10:00 (Israel), otherwise the day before
+  function confirmedThrough(state,today){
+    if(!state.checkedAt){ const y=new Date(today); y.setDate(y.getDate()-1); return y; }
+    let d, hr;
+    try{
+      const parts=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jerusalem",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",hourCycle:"h23"})
+        .formatToParts(new Date(state.checkedAt)).map(x=>[x.type,x.value]));
+      d=parseD(parts.year+"-"+parts.month+"-"+parts.day); hr=+parts.hour;
+    }catch(e){ const c=new Date(state.checkedAt); d=new Date(c.getFullYear(),c.getMonth(),c.getDate()); hr=c.getHours(); }
+    if(hr<10) d.setDate(d.getDate()-1);
+    return d>today ? new Date(today) : d;
+  }
   function addMonth(d){
     const y=d.getFullYear(), m=d.getMonth()+1, day=d.getDate();
     const last=new Date(y,m+1,0).getDate();
@@ -338,7 +351,9 @@
     // walk forward from the day after the break; vacation days are skipped (not counted, don't break)
     const dateOfCount=k=>{ const d=new Date(last); let c=0; while(c<k){ d.setDate(d.getDate()+1); if(!isVac(d)) c++; } return d; };
     const target=dateOfCount(total);
-    let days=0; { const d=new Date(last); while(diffDays(d,today)>0){ d.setDate(d.getDate()+1); if(!isVac(d)) days++; } }
+    const upTo=confirmedThrough(state,today);
+    const pendingToday=diffDays(upTo,today)>0;
+    let days=0; { const d=new Date(last); while(diffDays(d,upTo)>0){ d.setDate(d.getDate()+1); if(!isVac(d)) days++; } }
     const skipped=diffDays(last,target)-total;
     const vacNow=vac.find(v=>{const s=iso(today); return s>=v.from&&s<=v.to;});
     const done = days>=total;
@@ -346,9 +361,12 @@
     const pct=Math.round(shown/total*100);
 
     $("days").textContent=days;
-    $("daysLbl").textContent = days===1 ? "יום אחד ללא איחור" : "ימים ללא איחור";
+    $("daysLbl").textContent = days===1 ? "יום ללא איחור" : "ימים ללא איחור";
     if(days===1) $("days").textContent="1";
     $("targetDate").textContent=fmt(target);
+    $("pendingNote").textContent = pendingToday && !done
+      ? (diffDays(upTo,today)>1 ? `⏳ הנתונים נבדקו לאחרונה עד ${fmtShort(upTo)} — הספירה תתעדכן בבדיקה הבאה מול Webtop.` : "⏳ היום עוד לא נבדק — הספירה תתעדכן אחרי הבדיקה של 10:00.")
+      : "";
     $("vacNote").textContent = vacNow ? `🕎 עכשיו ${vacNow.name} — הספירה בהפסקה, הרצף לא נקטע.`
       : (skipped>0 ? `כולל ${skipped} ימי חופשה שלא נספרים (${vac.filter(v=>v.to>iso(last)&&v.from<=iso(target)).map(v=>v.name).join(", ")}).` : "");
     const rem=Math.max(0,total-days);
