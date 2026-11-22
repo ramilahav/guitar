@@ -1,7 +1,7 @@
 {
- "lastBreak": "2026-11-19",
+ "lastBreak": "2026-11-22",
  "lastBreakType": "איחור",
- "checkedAt": "2026-11-22T08:38:33Z",
+ "checkedAt": "2026-11-22T18:05:13Z",
  "source": "webtop-email",
  "vacations": [
   {
@@ -11,6 +11,11 @@
   }
  ],
  "resets": [
+  {
+   "date": "2026-11-22",
+   "type": "איחור",
+   "note": "שיעור 1"
+  },
   {
    "date": "2026-11-19",
    "type": "איחור",
